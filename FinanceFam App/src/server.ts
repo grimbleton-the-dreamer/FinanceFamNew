@@ -27,11 +27,6 @@ const config = process.env as unknown as EnvConfig;
 // Ensure the required environment variables are available
 if (!config.USER || !config.HOST || !config.DATABASE || !config.PASSWORD || !config.PORT) {
   console.error('Missing required environment variables!');
-  console.error(config.USER);
-  console.error(config.HOST);
-  console.error(config.DATABASE);
-  console.error(config.PASSWORD);
-  console.error(config.PORT);
   process.exit(1);
 }
 
