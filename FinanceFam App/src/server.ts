@@ -1,15 +1,15 @@
 // Importing pg module as a default import
 import pkg from 'pg';  // Default import for 'pg' (PostgreSQL module)
-const { Pool} = pkg;  // Destructure Pool and PoolClient from the default import
+const { Pool } = pkg;  // Destructure Pool from the default import
 
 // Importing required modules for path and dotenv
 import * as path from 'path';
 import * as dotenv from 'dotenv';
 
-// Load environment variables from a custom file (db.env)
+
 dotenv.config({
   override: true,  // Overwrite existing environment variables (if any)
-  path: path.join('./', 'db.env')  // Path to the custom environment file (db.env)
+  path: path.join('./src/', 'process.env')  // Path to the custom environment file (db.env)
 });
 
 // Define an interface for environment variables (optional but recommended for type safety)
@@ -24,6 +24,17 @@ interface EnvConfig {
 // Type-casting `process.env` to match our EnvConfig type
 const config = process.env as unknown as EnvConfig;
 
+// Ensure the required environment variables are available
+if (!config.USER || !config.HOST || !config.DATABASE || !config.PASSWORD || !config.PORT) {
+  console.error('Missing required environment variables!');
+  console.error(config.USER);
+  console.error(config.HOST);
+  console.error(config.DATABASE);
+  console.error(config.PASSWORD);
+  console.error(config.PORT);
+  process.exit(1);
+}
+
 // Initialize the PostgreSQL connection pool using environment variables
 const pool = new Pool({
   user: String(config.USER),
@@ -36,22 +47,23 @@ const pool = new Pool({
 // Async IIFE (Immediately Invoked Function Expression) to run the database query
 (async () => {
   let client;
-
   try {
     // Connecting to the database
     client = await pool.connect();
 
     // Running a simple query to fetch the current user
-    const { rows } = await client.query('SELECT user');
+    const { rows } = await client.query('SELECT current_user');
 
     // Extracting the current user from the result set
-    const currentUser = rows[0]['user'];
+    const currentUser = rows[0]['current_user'];
     console.log(`Connected as: ${currentUser}`);
   } catch (err) {
     // Handling any errors that occur during the query
     console.error('Error executing query:', err);
   } finally {
     // Safely releasing the client back to the pool if it exists
-    client?.release();
+    if (client) {
+      client.release();
+    }
   }
 })();
