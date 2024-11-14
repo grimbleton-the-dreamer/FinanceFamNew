@@ -1,0 +1,31 @@
+{
+  "files": [],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    },
+    {
+      "path": "./tsconfig.app.json"
+    }
+  ],
+  "compilerOptions": {
+    "target": "ESNext",                         // Use the latest ECMAScript version
+    "module": "ESNext",                         // Use ES module syntax (import/export)
+    "moduleResolution": "node",                 // Use Node.js resolution strategy for modules
+    "esModuleInterop": true,                    // Ensure compatibility between CommonJS and ES modules
+    "allowSyntheticDefaultImports": true,       // Allow default imports from CommonJS modules
+    "skipLibCheck": true,                       // Skip library checking for faster builds
+    "strict": true,                             // Enable all strict type-checking options
+    "outDir": "./dist",                         // Output compiled files to the "dist" folder
+    "baseUrl": "./src",                         // Base directory for module resolution
+    "resolveJsonModule": true,                  // Allow importing .json files
+    "noEmit": false,                            // Ensure TypeScript emits compiled files
+    "declaration": true,                        // Emit declaration files (.d.ts) for type definitions
+    "isolatedModules": true                     // Ensures that each file can be safely transpiled without dependency on other files
+  },
+  "include": [
+    "src/**/*.ts",                             // Include all TypeScript files in the "src" folder
+    "src/**/*.tsx"                             // Include TypeScript JSX files (if you're using React)
+  ],
+  "exclude": ["node_modules"]                  // Exclude the "node_modules" folder
+}

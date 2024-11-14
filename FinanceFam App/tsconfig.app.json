@@ -9,6 +9,10 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+
+    // Disable emitting JavaScript files
+    "noEmit": false
   }
 }
+
