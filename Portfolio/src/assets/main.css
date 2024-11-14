@@ -1,0 +1,14 @@
+@import './base.css';
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+.navigation-tabs {
+  text-decoration: none;
+  
+  transition: 0.4s;
+}
+
+@media (hover: hover) {
+  a:hover {
+    background-color: hsl(264, 73%, 65%, 0.2);
+  }
+}
