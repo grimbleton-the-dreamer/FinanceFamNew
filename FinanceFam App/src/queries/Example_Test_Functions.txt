@@ -1,0 +1,23 @@
+import { getUserById, createUser } from './queries/users';
+import { getAssetsByUserId, createAsset } from './queries/assets';
+import { getGoalsByUserId, createGoal } from './queries/goals';
+//import above where nessary
+async function test() {
+  try {
+    // Example: Fetch a user by ID
+    const user = await getUserById('1');
+    console.log('User:', user);
+
+    // Example: Fetch assets for a user
+    const assets = await getAssetsByUserId('1');
+    console.log('Assets:', assets);
+
+    // Example: Fetch goals for a user
+    const goals = await getGoalsByUserId('1');
+    console.log('Goals:', goals);
+  } catch (err) {
+    console.error('Error in main function:', err);
+  }
+}
+
+test();

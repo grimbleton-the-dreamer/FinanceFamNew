@@ -6,7 +6,6 @@ const { Pool } = pkg;  // Destructure Pool from the default import
 import * as path from 'path';
 import * as dotenv from 'dotenv';
 
-
 dotenv.config({
   override: true,  // Overwrite existing environment variables (if any)
   path: path.join('./src/', 'process.env')  // Path to the custom environment file (db.env)
@@ -39,26 +38,5 @@ const pool = new Pool({
   port: Number(config.PORT),  // Ensure the PORT is treated as a number
 });
 
-// Async IIFE (Immediately Invoked Function Expression) to run the database query
-(async () => {
-  let client;
-  try {
-    // Connecting to the database
-    client = await pool.connect();
-
-    // Running a simple query to fetch the current user
-    const { rows } = await client.query('SELECT current_user');
-
-    // Extracting the current user from the result set
-    const currentUser = rows[0]['current_user'];
-    console.log(`Connected as: ${currentUser}`);
-  } catch (err) {
-    // Handling any errors that occur during the query
-    console.error('Error executing query:', err);
-  } finally {
-    // Safely releasing the client back to the pool if it exists
-    if (client) {
-      client.release();
-    }
-  }
-})();
+// Export the pool to be used in query files
+export default pool;
