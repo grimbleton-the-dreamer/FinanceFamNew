@@ -1,9 +1,0 @@
-services:
-  postgresdb:
-    build:
-      context: ./
-      dockerfile: Dockerfile
-    container_name: postgres
-
-
-
