@@ -1,0 +1,29 @@
+services:
+  postgresdb:
+    build:
+      context: ./postgresDB
+      dockerfile: Dockerfile
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - pgdata:/var/lib/postgressql/data
+    ports:
+      - "5432:5432" #Expose port so dev can test
+    container_name: postgres
+  financefam:
+    build:
+      context: ./FinanceFamApp
+      dockerfile: Dockerfile
+    ports:
+      - "5173:80"
+    container_name: financefam
+  
+volumes:
+  pgdata:
+
+
+
+
+
