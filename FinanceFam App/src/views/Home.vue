@@ -6,24 +6,35 @@
                 <div class="d-flex bg-green area-head">
                     Charts
                 </div>
+
+                <!-- Chart canvases -->
                 <div class="d-flex bg-blue chart-container">
-                    <!-- Chart canvases -->
+
+                    <!-- Income vs. expenses chart -->
                     <div class="test2">
                         <p class="chart-title">Income vs Expenses</p>
                         <canvas ref="incomeExpensesChart" class="chart-canvas"></canvas>
                     </div>
+
+                    <!-- Remaining monthly budget chart -->
                     <div class="test">
                         <p class="chart-title">Remaining Budget</p>
                         <canvas ref="remainingBudgetChart" class="chart-canvas circle-chart"></canvas>
                     </div>
+
+                    <!-- Asset depreciation chart -->
                     <div class="test2">
                         <p class="chart-title">Asset Depreciation</p>
                         <canvas ref="assetDepreciationChart" class="chart-canvas"></canvas>
                     </div>
+
+                    <!-- Monthly expenses chart -->
                     <div class="test2">
                         <p class="chart-title">Monthly Expenses</p>
                         <canvas ref="monthlyExpenseChart" class="chart-canvas"></canvas>
                     </div>
+
+                    <!-- Goals progress chart -->
                     <div class="test2">
                         <div v-if="userGoals.length" class="goal-progress-container">
                             <div v-for="(goal, index) in userGoals" :key="goal.goalID" class="goal-chart">
@@ -40,7 +51,7 @@
                 </div>
             </div>
 
-
+            <!-- Expenses form -->
             <div class="d-flex flex-column area-small">
                 <div class="d-flex bg-green area-head">
                     Add a Recurring Expense
@@ -84,30 +95,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Second Row -->
-    <!--<div class="d-flex align-items-center justify-content-between home-page">
-        <div class="d-flex flex-column">
-            <div class="d-flex flex-column area-small">
-                <div class="d-flex bg-green area-head">
-                    Something else...
-                </div>
-                <div class="d-flex bg-blue">
-                    Content here
-                </div>
-            </div>
-        </div>
-
-        
-        <div class="d-flex flex-column bg-green area-large">
-            <div class="d-flex bg-green area-head">
-                Summary
-            </div>
-            <div class="d-flex bg-blue">
-                Summary content here
-            </div>
-        </div>
-    </div>-->
 </template>
 
 <script setup lang="ts">
@@ -115,53 +102,17 @@ import { ref, onMounted, watch, nextTick } from 'vue';
 import { Chart } from 'chart.js/auto';
 import { useAuthStore } from '../stores/useAuthStore';
 import { users as Users, assets as Assets, expenses as Expenses, goals as Goals } from '../stores/mockdata';
+import { User, Asset, Expense, Goal } from '../stores/types'; 
 
-const users = ref<User[]>(Users);
+//Variables for storing user data
+const users = ref<User[]>(Users); //This is an array, because admins will manage multiple users
 const assets = ref<Asset[]>(Assets);
 const expenses = ref<Expense[]>(Expenses);
 const goals = ref<Goal[]>(Goals);
 
 const authStore = useAuthStore();
 
-export interface User {
-    userID: string;
-    name: string;
-    password: string;
-    role: string;
-    yearlySalary?: number;
-    bankAmount?: number;
-    adminID: number | null;
-}
-
-export interface Asset {
-    assetID: string;
-    userID: string;
-    name: string;
-    initialPurchaseDate: Date;
-    purchasePrice: number;
-    desiredLifeSpan: number;
-}
-
-export interface Expense {
-    expenseID: string;
-    userID: string;
-    category: string;
-    amount: number;
-    dueDate: Date;
-    description?: string;
-    recurring: boolean;
-    isPaid: boolean;
-}
-
-export interface Goal {
-    goalID: string;
-    userID: string;
-    targetAmount: number;
-    progress?: string;
-    category: string;
-    deadline: Date;
-}
-
+// Reactive variable to hold expense form data 
 const newExpense = ref({
     category: '',
     amount: 0,
@@ -170,11 +121,14 @@ const newExpense = ref({
     isPaid: false,
 });
 
+// Submits the data in the expense form
 const handleSubmit = async () => {
     console.log('New expense data:', newExpense.value);
     if (!(userID.value.length > 0)) return;
 
-    const expenseID = (expenses.value.length + 1).toString(); // Generate a new ID based on the array length
+    //CHANGE THIS
+    const expenseID = (expenses.value.length + 1).toString(); // Generate a new ID based on the array length CHANGE THIS
+
     const newExpenseData = {
         expenseID,
         userID: userID.value,
@@ -198,6 +152,7 @@ const handleSubmit = async () => {
     };
     console.log(expenses.value);
 
+    //Reload the charts to reflect new data 
     userGoals.value = goals.value.filter(goal => goal.userID === userID.value);
     await nextTick();
     setupIncomeExpensesChart();
@@ -209,6 +164,7 @@ const handleSubmit = async () => {
 
 const userID = ref<string>(authStore.currentUser?.userID ?? '');
 
+// References to the charts
 const incomeExpensesChart = ref<HTMLCanvasElement | null>(null);
 const remainingBudgetChart = ref<HTMLCanvasElement | null>(null);
 const assetDepreciationChart = ref<HTMLCanvasElement | null>(null);
@@ -619,6 +575,7 @@ watch(userID, async () => {
     setupMonthlyExpenseChart();
 });
 
+//Load each chart 
 onMounted(async () => {
     userGoals.value = goals.value.filter(goal => goal.userID === userID.value);
     await nextTick();
