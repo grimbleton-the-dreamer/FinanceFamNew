@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Set the database name
+DB_NAME="postgres"
+
 # Initialize the PostgreSQL data directory
 initdb -D ${PGDATA}
 
@@ -15,17 +18,17 @@ wait_postgresql() {
 }
 wait_postgresql
 
-# Create the Postgres database named "postgres" with the "template_postgis" template
-createdb postgres
+# Drop the existing database (connect to template1 to avoid "cannot drop the currently open database" error)
+echo "Dropping the existing database (if it exists)..."
+psql -U postgres -d template1 -c "DROP DATABASE IF EXISTS ${DB_NAME};" 2>&1 | tee /var/log/postgresql/drop_db.log
 
-# Extract the schema and data from the backup file
-pg_restore -f /tmp/schema_new.sql -s /data/postgres-backup.sql 2>&1 | tee /var/log/postgresql/schema_extract.log
-#Edit and replace below for data
-#pg_restore -f /tmp/new_data.sql -a /data/postgres-backup.sql 2>&1 | tee /var/log/postgresql/data_extract.log
+# Create a new database
+echo "Creating a new database..."
+psql -U postgres -d template1 -c "CREATE DATABASE ${DB_NAME};" 2>&1 | tee /var/log/postgresql/create_db.log
 
-# Import the schema and data into the new database
-psql --dbname=postgres -f /tmp/schema_new.sql 2>&1 | tee /var/log/postgresql/schema_import.log
-#psql --dbname=postgres -f /tmp/new_data.sql 2>&1 | tee /var/log/postgresql/data_import.log
+# Restore the schema and data from the backup file (use psql for text-format backups)
+echo "Restoring schema and data from the backup file..."
+psql -U postgres -d ${DB_NAME} -f /data/postgres-backup.sql 2>&1 | tee /var/log/postgresql/restore.log
 
 # Keep PostgreSQL running
 tail -f /var/log/postgresql/logfile

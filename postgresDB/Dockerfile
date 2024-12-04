@@ -10,14 +10,14 @@ WORKDIR /data
 USER postgres
 
 # Copy the entrypoint script to the container
-COPY addSchema.sh /addSchema.sh
+COPY addSchema.sh /data
 USER root
-RUN chmod +x /addSchema.sh
+RUN chmod +x /data/addSchema.sh
 
 USER postgres
 
 # Run the entrypoint script
 CMD ["./addSchema.sh"]
-#COPY fin.sql /docker-entrypoint-initdb.d/
+COPY postgres-backup.sql  /data
 
 EXPOSE 5432
