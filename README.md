@@ -1,6 +1,6 @@
 # FinanceFam Developer Guide and User Manual
 
-Note: We reccomend using the live demo at https://financefam.asecrettoeveryone.com instead of compiling yourself for easy grading
+Note: We reccomend using the live demo at https://financefam.asecrettoeveryone.com instead of compiling yourself for easy grading. Compiling yourself will take 1-2 hours.
 FinanceFam is a financial management application designed for efficiency and ease of use. This guide provides detailed instructions for installing dependencies and running the application.
 
 ---
