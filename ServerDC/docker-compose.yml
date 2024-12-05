@@ -12,13 +12,23 @@ services:
     ports:
       - "5432:5432" #Expose port so dev can test
     container_name: postgres
-  financefam:
+financefam:
     build:
       context: ./FinanceFamApp
-      dockerfile: Dockerfile
-    ports:
-      - "5173:80"
+      dockerfile: Dockerfile  # Use your provided Dockerfile for the multi-stage build
     container_name: financefam
+    expose:
+      - "80"  # Expose port internally for Nginx to route requests to
+nginx:
+  image: nginx:latest
+  container_name: nginx
+  volumes:
+    - ./nginx.conf:/etc/nginx/nginx.conf  # Mount the custom Nginx config
+  ports:
+    - "80:80"  # Expose port 80 to the outside world (HTTP traffic)
+  depends_on:
+    - financefam
+    
   
 volumes:
   pgdata:
