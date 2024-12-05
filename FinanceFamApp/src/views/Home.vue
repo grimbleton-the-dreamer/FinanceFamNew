@@ -127,10 +127,10 @@ const currentUser = ref(users.value.find(e => e.userID == userID.value));
 
 // Chart instances
 let incomeExpensesChartInstance: Chart | null = null;
-let remainingBudgetChartInstance: Chart | null = null;
+let remainingBudgetChartInstance: any = null;
 let assetDepreciationChartInstance: Chart | null = null;
 let monthlyExpenseChartInstance: Chart | null = null;
-let goalChartInstances: Chart[] = [];
+let goalChartInstances: any[] = [];
 
 // References to the chart canvases
 const incomeExpensesChart = ref<HTMLCanvasElement | null>(null);
