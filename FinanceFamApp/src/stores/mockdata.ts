@@ -3,16 +3,16 @@ import type { User, Asset, Expense, Goal } from "./types";
 
 // Users
 const users: User[] = [
-    { userID: '1', name: 'Admin One', password: 'password123', role: 'admin', yearlySalary: 120000, bankAmount: 50000, adminID: null },
-    { userID: '2', name: 'Admin Two', password: 'password456', role: 'admin', yearlySalary: 100000, bankAmount: 70000, adminID: null },
-    { userID: '3', name: 'User Three', password: 'password789', role: 'user', yearlySalary: 80000, bankAmount: 30000, adminID: 1 },
-    { userID: '4', name: 'User Four', password: 'password321', role: 'user', yearlySalary: 75000, bankAmount: 20000, adminID: 1 },
-    { userID: '5', name: 'User Five', password: 'password654', role: 'user', yearlySalary: 65000, bankAmount: 15000, adminID: 1 },
-    { userID: '6', name: 'User Six', password: 'password987', role: 'user', yearlySalary: 70000, bankAmount: 25000, adminID: 1 },
-    { userID: '7', name: 'User Seven', password: 'password1234', role: 'user', yearlySalary: 90000, bankAmount: 40000, adminID: 2 },
-    { userID: '8', name: 'User Eight', password: 'password4321', role: 'user', yearlySalary: 85000, bankAmount: 35000, adminID: 2 },
-    { userID: '9', name: 'User Nine', password: 'password5678', role: 'user', yearlySalary: 60000, bankAmount: 10000, adminID: 2 },
-    { userID: '10', name: 'User Ten', password: 'password8765', role: 'user', yearlySalary: 95000, bankAmount: 45000, adminID: 2 },
+    { userID: '1', name: 'mkovach', password: 'password123', role: 'admin', yearlySalary: 120000, bankAmount: 50000, adminID: null },
+    { userID: '2', name: 'ldavis', password: 'password456', role: 'admin', yearlySalary: 100000, bankAmount: 70000, adminID: null },
+    { userID: '3', name: 'rstepp', password: 'password789', role: 'user', yearlySalary: 80000, bankAmount: 30000, adminID: 1 },
+    { userID: '4', name: 'kpattonp', password: 'password123', role: 'user', yearlySalary: 75000, bankAmount: 20000, adminID: 1 },
+    { userID: '5', name: 'yongjianfu', password: 'password123', role: 'user', yearlySalary: 65000, bankAmount: 15000, adminID: 1 },
+    { userID: '6', name: 'bananaman', password: 'password123', role: 'user', yearlySalary: 70000, bankAmount: 25000, adminID: 1 },
+    { userID: '7', name: 'cheese123', password: 'password123', role: 'user', yearlySalary: 90000, bankAmount: 40000, adminID: 2 },
+    { userID: '8', name: 'mulchlover67', password: 'password123', role: 'user', yearlySalary: 85000, bankAmount: 35000, adminID: 2 },
+    { userID: '9', name: 'divinebread', password: 'password123', role: 'user', yearlySalary: 60000, bankAmount: 10000, adminID: 2 },
+    { userID: '10', name: 'the_untitled_goose', password: 'password123', role: 'user', yearlySalary: 95000, bankAmount: 45000, adminID: 2 },
   ];
   
   // Assets
@@ -46,16 +46,16 @@ const users: User[] = [
   
   // Goals
   const goals: Goal[] = [
-    { goalID: '1', userID: '1', targetAmount: 20000, progress: '50%', category: 'savings', deadline: new Date('2024-06-01') },
-    { goalID: '2', userID: '2', targetAmount: 15000, progress: '30%', category: 'savings', deadline: new Date('2024-12-01') },
-    { goalID: '3', userID: '3', targetAmount: 10000, progress: '70%', category: 'spending', deadline: new Date('2024-12-12') },
-    { goalID: '4', userID: '4', targetAmount: 5000, progress: '20%', category: 'savings', deadline: new Date('2024-08-15') },
-    { goalID: '5', userID: '5', targetAmount: 12000, progress: '40%', category: 'savings', deadline: new Date('2024-12-01') },
-    { goalID: '6', userID: '6', targetAmount: 8000, progress: '60%', category: 'spending', deadline: new Date('2024-05-01') },
-    { goalID: '7', userID: '7', targetAmount: 7000, progress: '10%', category: 'savings', deadline: new Date('2024-07-01') },
-    { goalID: '8', userID: '8', targetAmount: 6000, progress: '80%', category: 'spending', deadline: new Date('2024-04-01') },
-    { goalID: '9', userID: '9', targetAmount: 4000, progress: '25%', category: 'savings', deadline: new Date('2024-10-01') },
-    { goalID: '10', userID: '10', targetAmount: 9000, progress: '45%', category: 'savings', deadline: new Date('2024-11-01') },
+    { goalID: '1', userID: '1', targetAmount: 20000, progress: '50%', category: 'savings', deadline: new Date('2024-12-20') },
+    { goalID: '2', userID: '2', targetAmount: 15000, progress: '30%', category: 'savings', deadline: new Date('2024-12-17') },
+    { goalID: '3', userID: '3', targetAmount: 10000, progress: '70%', category: 'spending', deadline: new Date('2024-12-22') },
+    { goalID: '4', userID: '4', targetAmount: 5000, progress: '20%', category: 'savings', deadline: new Date('2024-12-25') },
+    { goalID: '5', userID: '5', targetAmount: 12000, progress: '40%', category: 'savings', deadline: new Date('2024-12-30') },
+    { goalID: '6', userID: '6', targetAmount: 8000, progress: '60%', category: 'spending', deadline: new Date('2024-12-27') },
+    { goalID: '7', userID: '7', targetAmount: 7000, progress: '10%', category: 'savings', deadline: new Date('2024-12-23') },
+    { goalID: '8', userID: '8', targetAmount: 6000, progress: '80%', category: 'spending', deadline: new Date('2024-12-21') },
+    { goalID: '9', userID: '9', targetAmount: 4000, progress: '25%', category: 'savings', deadline: new Date('2024-12-19') },
+    { goalID: '10', userID: '10', targetAmount: 9000, progress: '45%', category: 'savings', deadline: new Date('2024-12-20') },
   ];
   
   // Export the mock data
