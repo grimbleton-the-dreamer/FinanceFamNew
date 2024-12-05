@@ -1,0 +1,22 @@
+services:
+  postgresdb:
+    build:
+      context: ./postgresDB
+      dockerfile: Dockerfile
+    volumes:
+      - pgdata:/var/lib/postgressql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "5555:5432" #Expose port so dev can test
+    container_name: postgres
+  
+volumes:
+  pgdata:
+
+
+
+
+

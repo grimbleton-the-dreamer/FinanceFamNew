@@ -1,3 +1,4 @@
+"use strict";
 /*
 import express = require('express');
 import bodyParser = require('body-parser');
@@ -37,4 +38,4 @@ app.listen(PORT, () => {
   console.log(`API is running on http://localhost:${PORT}`);
 });
 
-*/
+*/ 

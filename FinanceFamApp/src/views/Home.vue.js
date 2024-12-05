@@ -1,144 +1,38 @@
-<template>
-    <div class="d-flex align-items-center justify-content-between home-page">
-
-        <div class="d-flex flex-column">
-
-            <!-- Charts Area -->
-            <div class="d-flex flex-column area-small">
-                <div class="d-flex bg-green area-head">
-                    Charts for {{ currentUser?.name }}
-                </div>
-
-                <!-- Chart canvases -->
-                <div class="d-flex bg-blue chart-container">
-
-                    <!-- Income vs. expenses chart -->
-                    <div class="test2">
-                        <p class="chart-title">Income vs Expenses</p>
-                        <canvas ref="incomeExpensesChart" class="chart-canvas"></canvas>
-                    </div>
-
-                    <!-- Remaining monthly budget chart -->
-                    <div class="test">
-                        <p class="chart-title">Remaining Budget</p>
-                        <canvas ref="remainingBudgetChart" class="chart-canvas circle-chart"></canvas>
-                    </div>
-
-                    <!-- Asset depreciation chart -->
-                    <div class="test2">
-                        <p class="chart-title">Asset Depreciation</p>
-                        <canvas ref="assetDepreciationChart" class="chart-canvas"></canvas>
-                    </div>
-
-                    <!-- Monthly expenses chart -->
-                    <div class="test2">
-                        <p class="chart-title">Monthly Expenses</p>
-                        <canvas ref="monthlyExpenseChart" class="chart-canvas"></canvas>
-                    </div>
-
-                    <!-- Goals progress chart -->
-                    <div class="test2">
-                        <div v-if="userGoals.length" class="goal-progress-container">
-                            <div v-for="(goal, index) in userGoals" :key="goal.goalID" class="goal-chart">
-                                <p class="chart-title">
-                                    Goal: {{ goal.category }} (ID: {{ goal.goalID }})
-                                </p>
-                                <canvas :ref="el => (goalCharts[index] = el as HTMLCanvasElement)"
-                                    class="goal-chart-canvas chart-canvas"></canvas>
-                                <p>Target Amount: ${{ goal.targetAmount }}</p>
-                                <p>Deadline: {{ formatDate(goal.deadline) }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Expenses form -->
-            <div class="d-flex flex-column area-small">
-                <div class="d-flex bg-green area-head">
-                    Add a Recurring Expense
-                </div>
-                <div class="d-flex flex-column bg-blue expense-form">
-                    <form @submit.prevent="handleSubmit" class="d-flex flex-column">
-                        <label for="category" class="form-label">Expense Category:</label>
-                        <input type="text" id="category" v-model="newExpense.category" class="form-input"
-                            placeholder="e.g., Rent" required />
-
-                        <label for="amount" class="form-label">Amount:</label>
-                        <input type="number" id="amount" v-model="newExpense.amount" class="form-input"
-                            placeholder="e.g., 500" required />
-
-                        <label for="dueDate" class="form-label">Due Date:</label>
-                        <input type="date" id="dueDate" v-model="newExpense.dueDate" class="form-input" required />
-
-                        <label for="isRecurring" class="form-label">Recurring:</label>
-                        <select id="isRecurring" v-model="newExpense.recurring" class="form-input" required>
-                            <option :value="true">Yes</option>
-                            <option :value="false">No</option>
-                        </select>
-
-                        <button type="submit" class="submit-button">Add Expense</button>
-                    </form>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Notifications Area -->
-        <div class="d-flex flex-column bg-green area-large">
-            <div class="d-flex bg-green area-head">
-                Notifications
-            </div>
-            <div class="d-flex bg-blue notifications-container">
-                <div v-for="notification in notifications" :key="notification.id" class="notification-item">
-                    <p class="notification-title">{{ notification.title }}</p>
-                    <p class="notification-message">{{ notification.message }}</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</template>
-
-<script setup lang="ts">
 import { ref, onMounted, watch, nextTick, defineProps } from 'vue';
 import { Chart } from 'chart.js/auto';
 import { useAuthStore } from '../stores/useAuthStore';
 import { users as Users, assets as Assets, expenses as Expenses, goals as Goals } from '../stores/mockdata';
-import { type User, type Asset, type Expense, type Goal } from '../stores/types'; 
-
+import {} from '../stores/types';
+const { defineSlots, defineEmits, defineExpose, defineModel, defineOptions, withDefaults, } = await import('vue');
 const props = defineProps({
-  userId: {
-    type: String, 
-    required: true 
-  }
+    userId: {
+        type: String,
+        required: true
+    }
 });
-
 // Reactive variables
-const users = ref<User[]>(Users);
-const assets = ref<Asset[]>(Assets);
-const expenses = ref<Expense[]>(Expenses);
-const goals = ref<Goal[]>(Goals);
-const managedUsers = ref<User[]>([]);
+const users = ref(Users);
+const assets = ref(Assets);
+const expenses = ref(Expenses);
+const goals = ref(Goals);
+const managedUsers = ref([]);
 const authStore = useAuthStore();
-const userID = ref<string>(props.userId);
-const isAdmin = ref<boolean>(false);
-const userGoals = ref<Goal[]>([]);
+const userID = ref(props.userId);
+const isAdmin = ref(false);
+const userGoals = ref([]);
 const currentUser = ref(users.value.find(e => e.userID == userID.value));
-
 // Chart instances
-let incomeExpensesChartInstance: Chart | null = null;
-let remainingBudgetChartInstance: any = null;
-let assetDepreciationChartInstance: Chart | null = null;
-let monthlyExpenseChartInstance: Chart | null = null;
-let goalChartInstances: any[] = [];
-
+let incomeExpensesChartInstance = null;
+let remainingBudgetChartInstance = null;
+let assetDepreciationChartInstance = null;
+let monthlyExpenseChartInstance = null;
+let goalChartInstances = [];
 // References to the chart canvases
-const incomeExpensesChart = ref<HTMLCanvasElement | null>(null);
-const remainingBudgetChart = ref<HTMLCanvasElement | null>(null);
-const assetDepreciationChart = ref<HTMLCanvasElement | null>(null);
-const monthlyExpenseChart = ref<HTMLCanvasElement | null>(null);
-const goalCharts = ref<HTMLCanvasElement[]>([]);
-
+const incomeExpensesChart = ref(null);
+const remainingBudgetChart = ref(null);
+const assetDepreciationChart = ref(null);
+const monthlyExpenseChart = ref(null);
+const goalCharts = ref([]);
 // Reactive variable to hold expense form data 
 const newExpense = ref({
     category: '',
@@ -147,14 +41,12 @@ const newExpense = ref({
     recurring: true,
     isPaid: false,
 });
-
 // Function to handle expense form submission
 const handleSubmit = async () => {
     console.log('New expense data:', newExpense.value);
-    if (!(userID.value.length > 0)) return;
-
+    if (!(userID.value.length > 0))
+        return;
     const expenseID = (expenses.value.length + 1).toString();
-
     const newExpenseData = {
         expenseID,
         userID: userID.value,
@@ -164,10 +56,8 @@ const handleSubmit = async () => {
         recurring: newExpense.value.recurring,
         isPaid: false,
     };
-
     expenses.value.push(newExpenseData);
     console.log('New expense added:', newExpenseData);
-
     // Clear the form fields after submission
     newExpense.value = {
         category: '',
@@ -177,7 +67,6 @@ const handleSubmit = async () => {
         isPaid: false,
     };
     console.log(expenses.value);
-
     // Reload the charts to reflect new data 
     userGoals.value = goals.value.filter(goal => goal.userID === userID.value);
     await nextTick();
@@ -188,34 +77,31 @@ const handleSubmit = async () => {
     //setupGoalProgressCharts();
     setupMonthlyExpenseChart();
 };
-
 // Determine admin status and fetch managed users
-function getManagedUsers(): void {
+function getManagedUsers() {
     const user = users.value.find(e => e.userID === authStore.currentUser?.userID);
     console.log("USER: ", user);
     if (user?.role === "admin") {
         isAdmin.value = true;
         managedUsers.value = users.value.filter(e => String(e.adminID) === userID.value);
         console.log("MANAGED USERS", managedUsers.value);
-    } else {
+    }
+    else {
         isAdmin.value = false;
         managedUsers.value = [];
     }
 }
-
 // Destroy an existing chart instance
-function destroyChart(chartInstance: Chart | null): void {
+function destroyChart(chartInstance) {
     if (chartInstance) {
         chartInstance.destroy();
     }
 }
-
 // Destroy all goal chart instances
-function destroyGoalCharts(): void {
+function destroyGoalCharts() {
     goalChartInstances.forEach(chart => chart.destroy());
     goalChartInstances = [];
 }
-
 // Income vs Expenses Chart
 const setupIncomeExpensesChart = () => {
     destroyChart(incomeExpensesChartInstance);
@@ -279,7 +165,6 @@ const setupIncomeExpensesChart = () => {
         });
     }
 };
-
 // Remaining Budget Chart
 const setupRemainingBudgetChart = () => {
     destroyChart(remainingBudgetChartInstance);
@@ -287,29 +172,22 @@ const setupRemainingBudgetChart = () => {
         const user = users.value.find(user => user.userID === userID.value);
         const userExpenses = expenses.value.filter(expense => expense.userID === userID.value);
         const totalSpent = userExpenses.reduce((total, expense) => {
-            if (expense.isPaid) return total;
+            if (expense.isPaid)
+                return total;
             if (expense.recurring) {
-                const monthsElapsed = Math.floor(
-                    (new Date().getTime() - new Date(expense.dueDate).getTime()) / (1000 * 60 * 60 * 24 * 30)
-                );
+                const monthsElapsed = Math.floor((new Date().getTime() - new Date(expense.dueDate).getTime()) / (1000 * 60 * 60 * 24 * 30));
                 return total + expense.amount * Math.max(1, monthsElapsed);
-            } else {
+            }
+            else {
                 return total + expense.amount;
             }
         }, 0);
-
         const oneMonthAgo = new Date();
         oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-
-        const recentAssets = assets.value.filter(
-            asset => asset.userID === userID.value && new Date(asset.initialPurchaseDate) >= oneMonthAgo
-        );
-
+        const recentAssets = assets.value.filter(asset => asset.userID === userID.value && new Date(asset.initialPurchaseDate) >= oneMonthAgo);
         const totalAssetCost = recentAssets.reduce((total, asset) => total + asset.purchasePrice, 0);
-
         const totalSpentIncludingAssets = totalSpent + totalAssetCost;
         const remaining = (user?.bankAmount || 0) - totalSpentIncludingAssets;
-
         remainingBudgetChartInstance = new Chart(remainingBudgetChart.value, {
             type: 'doughnut',
             data: {
@@ -335,7 +213,7 @@ const setupRemainingBudgetChart = () => {
                     },
                     tooltip: {
                         callbacks: {
-                            label: function (context: any) {
+                            label: function (context) {
                                 return `${context.label}: $${context.parsed}`;
                             },
                         },
@@ -345,25 +223,18 @@ const setupRemainingBudgetChart = () => {
         });
     }
 };
-
 // Asset Depreciation Chart
 const setupAssetDepreciationChart = () => {
     destroyChart(assetDepreciationChartInstance);
     if (assetDepreciationChart.value) {
         const userAssets = assets.value.filter(asset => asset.userID === userID.value);
-
         const datasets = userAssets.map(asset => {
             const data = [];
             const depreciationRate = asset.purchasePrice / asset.desiredLifeSpan;
-
             for (let year = 0; year <= asset.desiredLifeSpan; year++) {
-                const depreciatedValue = Math.max(
-                    0,
-                    asset.purchasePrice - depreciationRate * year
-                );
+                const depreciatedValue = Math.max(0, asset.purchasePrice - depreciationRate * year);
                 data.push(depreciatedValue);
             }
-
             return {
                 label: asset.name,
                 data,
@@ -372,10 +243,8 @@ const setupAssetDepreciationChart = () => {
                 fill: false,
             };
         });
-
         const maxYears = Math.max(...userAssets.map(a => a.desiredLifeSpan)) + 1;
         const labels = Array.from({ length: maxYears }, (_, i) => `Year ${i}`);
-
         assetDepreciationChartInstance = new Chart(assetDepreciationChart.value, {
             type: 'line',
             data: {
@@ -422,7 +291,7 @@ const setupAssetDepreciationChart = () => {
                     },
                     tooltip: {
                         callbacks: {
-                            label: function (context: any) {
+                            label: function (context) {
                                 return `${context.dataset.label}: $${context.parsed.y.toFixed(2)}`;
                             },
                         },
@@ -432,7 +301,6 @@ const setupAssetDepreciationChart = () => {
         });
     }
 };
-
 // Helper function to generate a random color for each asset line
 const getRandomColor = () => {
     const letters = '0123456789ABCDEF';
@@ -442,14 +310,12 @@ const getRandomColor = () => {
     }
     return color;
 };
-
 // Goal Progress Charts (Pie Charts)
 const setupGoalProgressCharts = () => {
     destroyGoalCharts();
     userGoals.value.forEach((goal, index) => {
         const progressValue = parseFloat(goal.progress?.replace('%', '') || '0');
         const ctx = goalCharts.value[index];
-
         if (ctx) {
             const chartInstance = new Chart(ctx, {
                 type: 'pie',
@@ -475,7 +341,7 @@ const setupGoalProgressCharts = () => {
                         },
                         tooltip: {
                             callbacks: {
-                                label: function (context:any) {
+                                label: function (context) {
                                     return `${context.label}: ${context.parsed}%`;
                                 },
                             },
@@ -487,7 +353,6 @@ const setupGoalProgressCharts = () => {
         }
     });
 };
-
 // Monthly Expense Chart
 const setupMonthlyExpenseChart = () => {
     destroyChart(monthlyExpenseChartInstance);
@@ -496,9 +361,9 @@ const setupMonthlyExpenseChart = () => {
         expenses.value
             .filter(expense => expense.userID === userID.value)
             .forEach(expense => {
-                const month = new Date(expense.dueDate).getMonth();
-                monthlyExpenses[month] += expense.amount;
-            });
+            const month = new Date(expense.dueDate).getMonth();
+            monthlyExpenses[month] += expense.amount;
+        });
         monthlyExpenseChartInstance = new Chart(monthlyExpenseChart.value, {
             type: 'line',
             data: {
@@ -567,15 +432,12 @@ const setupMonthlyExpenseChart = () => {
         });
     }
 };
-
 // Format date function
-const formatDate = (date: Date): string => {
+const formatDate = (date) => {
     return date.toLocaleDateString();
 };
-
 // Notifications
-const notifications = ref<{ id: string; title: string; message: string }[]>([]);
-
+const notifications = ref([]);
 // Generate notifications for unpaid expenses and upcoming goals
 const today = new Date();
 expenses.value.forEach(expense => {
@@ -590,13 +452,11 @@ expenses.value.forEach(expense => {
         });
     }
 });
-
 // Only add goals if the target amount is less than $10,000
 goals.value.forEach(goal => {
     if (goal.userID === userID.value) {
         const deadline = new Date(goal.deadline);
         const daysRemaining = Math.ceil((deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-
         if (daysRemaining <= 30) {
             const progressValue = parseFloat(goal.progress?.replace('%', '') || '0') / 100;
             const spentAmount = goal.targetAmount * progressValue;
@@ -610,7 +470,6 @@ goals.value.forEach(goal => {
         }
     }
 });
-
 // Watch for changes in userID to update data and charts
 watch(userID, async () => {
     getManagedUsers();
@@ -623,7 +482,6 @@ watch(userID, async () => {
     setupGoalProgressCharts();
     setupMonthlyExpenseChart();
 });
-
 // Load each chart and get managed users on component mount
 onMounted(async () => {
     getManagedUsers();
@@ -635,253 +493,229 @@ onMounted(async () => {
     setupGoalProgressCharts();
     setupMonthlyExpenseChart();
 });
-</script>
-
-<style scoped lang="less">
-.expense-form {
-    border-bottom-left-radius: 8px;
-    border-bottom-right-radius: 8px;
-}
-
-.test {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 25%;
-    height: auto;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.test2 {
-    width: 50%;
-    height: auto;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.chart-title {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 10px;
-    color: black;
-}
-
-.chart-container {
-    display: flex;
-    flex-direction: column;
-    padding: 10px;
-    border-bottom-right-radius: 8px;
-    border-bottom-left-radius: 8px;
-}
-
-.chart-canvas {
-    flex: 1 1 100%;
-    max-width: 100%;
-    aspect-ratio: 2 / 1;
-    margin: 10px 0;
-}
-
-.circle-chart {
-    aspect-ratio: 1;
-}
-
-.goal-progress-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
-    margin-top: 20px;
-}
-
-.goal-chart {
-    flex: 1 1 100%;
-    max-width: 100%;
-    text-align: center;
-    margin: 10px 0;
-}
-
-.goal-chart-canvas {
-    width: 100% !important;
-    aspect-ratio: 1 / 1;
-}
-
-.bg-green {
-    background-color: #78bd80;
-}
-
-.d-flex {
-    display: flex;
-}
-
-.flex-column {
-    flex-direction: column;
-}
-
-.bg-blue {
-    background-color: #6a93c1;
-}
-
-.justify-content-between {
-    justify-content: space-between;
-}
-
-@keyframes fadeInUp {
-    0% {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-
-    100% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.fade-in {
-    animation: fadeInUp 1s ease-out forwards;
-    opacity: 0;
-}
-
-.home-page {
-    justify-content: space-between;
-    width: 80%;
-    margin-left: 20rem;
-    margin-right: 10rem;
-    margin-top: 5rem;
-
-    .home-wrapper {
-        display: flex;
-        margin-left: 20rem;
-        flex-direction: column;
-        border-top-left-radius: 5px;
-        border-left: 1px solid white;
-        border-top: 1px solid white;
-        padding: 1rem;
-
-        .welcome,
-        .welcome-sub,
-        .welcome-body {
-            color: white;
-            font-weight: 100;
-            line-height: 12px;
+; /* PartiallyEnd: #3632/scriptSetup.vue */
+const __VLS_fnComponent = (await import('vue')).defineComponent({
+    props: {
+        userId: {
+            type: String,
+            required: true
         }
-
-        .welcome {
-            font-size: 48px;
-            margin-bottom: 2rem;
-        }
-
-        .welcome-body {
-            line-height: 24px;
+    },
+});
+;
+let __VLS_functionalComponentProps;
+function __VLS_template() {
+    const __VLS_ctx = {};
+    const __VLS_localComponents = {
+        ...{},
+        ...{},
+        ...__VLS_ctx,
+    };
+    let __VLS_components;
+    const __VLS_localDirectives = {
+        ...{},
+        ...__VLS_ctx,
+    };
+    let __VLS_directives;
+    let __VLS_styleScopedClasses;
+    __VLS_styleScopedClasses['welcome'];
+    __VLS_styleScopedClasses['welcome-body'];
+    __VLS_styleScopedClasses['area-small'];
+    __VLS_styleScopedClasses['area-large'];
+    __VLS_styleScopedClasses['area-small'];
+    __VLS_styleScopedClasses['bg-blue'];
+    __VLS_styleScopedClasses['expense-form'];
+    __VLS_styleScopedClasses['submit-button'];
+    // CSS variable injection 
+    // CSS variable injection end 
+    let __VLS_resolvedLocalAndGlobalComponents;
+    __VLS_elementAsFunction(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({ ...{ class: ("d-flex align-items-center justify-content-between home-page") }, });
+    __VLS_elementAsFunction(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({ ...{ class: ("d-flex flex-column") }, });
+    __VLS_elementAsFunction(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({ ...{ class: ("d-flex flex-column area-small") }, });
+    __VLS_elementAsFunction(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({ ...{ class: ("d-flex bg-green area-head") }, });
+    (__VLS_ctx.currentUser?.name);
+    __VLS_elementAsFunction(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({ ...{ class: ("d-flex bg-blue chart-container") }, });
+    __VLS_elementAsFunction(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({ ...{ class: ("test2") }, });
+    __VLS_elementAsFunction(__VLS_intrinsicElements.p, __VLS_intrinsicElements.p)({ ...{ class: ("chart-title") }, });
+    __VLS_elementAsFunction(__VLS_intrinsicElements.canvas, __VLS_intrinsicElements.canvas)({ ref: ("incomeExpensesChart"), ...{ class: ("chart-canvas") }, });
+    // @ts-ignore navigation for `const incomeExpensesChart = ref()`
+    __VLS_ctx.incomeExpensesChart;
+    __VLS_elementAsFunction(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({ ...{ class: ("test") }, });
+    __VLS_elementAsFunction(__VLS_intrinsicElements.p, __VLS_intrinsicElements.p)({ ...{ class: ("chart-title") }, });
+    __VLS_elementAsFunction(__VLS_intrinsicElements.canvas, __VLS_intrinsicElements.canvas)({ ref: ("remainingBudgetChart"), ...{ class: ("chart-canvas circle-chart") }, });
+    // @ts-ignore navigation for `const remainingBudgetChart = ref()`
+    __VLS_ctx.remainingBudgetChart;
+    __VLS_elementAsFunction(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({ ...{ class: ("test2") }, });
+    __VLS_elementAsFunction(__VLS_intrinsicElements.p, __VLS_intrinsicElements.p)({ ...{ class: ("chart-title") }, });
+    __VLS_elementAsFunction(__VLS_intrinsicElements.canvas, __VLS_intrinsicElements.canvas)({ ref: ("assetDepreciationChart"), ...{ class: ("chart-canvas") }, });
+    // @ts-ignore navigation for `const assetDepreciationChart = ref()`
+    __VLS_ctx.assetDepreciationChart;
+    __VLS_elementAsFunction(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({ ...{ class: ("test2") }, });
+    __VLS_elementAsFunction(__VLS_intrinsicElements.p, __VLS_intrinsicElements.p)({ ...{ class: ("chart-title") }, });
+    __VLS_elementAsFunction(__VLS_intrinsicElements.canvas, __VLS_intrinsicElements.canvas)({ ref: ("monthlyExpenseChart"), ...{ class: ("chart-canvas") }, });
+    // @ts-ignore navigation for `const monthlyExpenseChart = ref()`
+    __VLS_ctx.monthlyExpenseChart;
+    __VLS_elementAsFunction(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({ ...{ class: ("test2") }, });
+    if (__VLS_ctx.userGoals.length) {
+        __VLS_elementAsFunction(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({ ...{ class: ("goal-progress-container") }, });
+        for (const [goal, index] of __VLS_getVForSourceType((__VLS_ctx.userGoals))) {
+            __VLS_elementAsFunction(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({ key: ((goal.goalID)), ...{ class: ("goal-chart") }, });
+            __VLS_elementAsFunction(__VLS_intrinsicElements.p, __VLS_intrinsicElements.p)({ ...{ class: ("chart-title") }, });
+            (goal.category);
+            (goal.goalID);
+            __VLS_elementAsFunction(__VLS_intrinsicElements.canvas, __VLS_intrinsicElements.canvas)({ ref: ((el => (__VLS_ctx.goalCharts[index] = el))), ...{ class: ("goal-chart-canvas chart-canvas") }, });
+            __VLS_elementAsFunction(__VLS_intrinsicElements.p, __VLS_intrinsicElements.p)({});
+            (goal.targetAmount);
+            __VLS_elementAsFunction(__VLS_intrinsicElements.p, __VLS_intrinsicElements.p)({});
+            (__VLS_ctx.formatDate(goal.deadline));
         }
     }
-
-    .dice-container {
-        margin-left: 2rem;
+    __VLS_elementAsFunction(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({ ...{ class: ("d-flex flex-column area-small") }, });
+    __VLS_elementAsFunction(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({ ...{ class: ("d-flex bg-green area-head") }, });
+    __VLS_elementAsFunction(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({ ...{ class: ("d-flex flex-column bg-blue expense-form") }, });
+    __VLS_elementAsFunction(__VLS_intrinsicElements.form, __VLS_intrinsicElements.form)({ ...{ onSubmit: (__VLS_ctx.handleSubmit) }, ...{ class: ("d-flex flex-column") }, });
+    __VLS_elementAsFunction(__VLS_intrinsicElements.label, __VLS_intrinsicElements.label)({ for: ("category"), ...{ class: ("form-label") }, });
+    __VLS_elementAsFunction(__VLS_intrinsicElements.input)({ type: ("text"), id: ("category"), value: ((__VLS_ctx.newExpense.category)), ...{ class: ("form-input") }, placeholder: ("e.g., Rent"), required: (true), });
+    __VLS_elementAsFunction(__VLS_intrinsicElements.label, __VLS_intrinsicElements.label)({ for: ("amount"), ...{ class: ("form-label") }, });
+    __VLS_elementAsFunction(__VLS_intrinsicElements.input)({ type: ("number"), id: ("amount"), ...{ class: ("form-input") }, placeholder: ("e.g., 500"), required: (true), });
+    (__VLS_ctx.newExpense.amount);
+    __VLS_elementAsFunction(__VLS_intrinsicElements.label, __VLS_intrinsicElements.label)({ for: ("dueDate"), ...{ class: ("form-label") }, });
+    __VLS_elementAsFunction(__VLS_intrinsicElements.input)({ type: ("date"), id: ("dueDate"), ...{ class: ("form-input") }, required: (true), });
+    (__VLS_ctx.newExpense.dueDate);
+    __VLS_elementAsFunction(__VLS_intrinsicElements.label, __VLS_intrinsicElements.label)({ for: ("isRecurring"), ...{ class: ("form-label") }, });
+    __VLS_elementAsFunction(__VLS_intrinsicElements.select, __VLS_intrinsicElements.select)({ id: ("isRecurring"), value: ((__VLS_ctx.newExpense.recurring)), ...{ class: ("form-input") }, required: (true), });
+    __VLS_elementAsFunction(__VLS_intrinsicElements.option, __VLS_intrinsicElements.option)({ value: ((true)), });
+    __VLS_elementAsFunction(__VLS_intrinsicElements.option, __VLS_intrinsicElements.option)({ value: ((false)), });
+    __VLS_elementAsFunction(__VLS_intrinsicElements.button, __VLS_intrinsicElements.button)({ type: ("submit"), ...{ class: ("submit-button") }, });
+    __VLS_elementAsFunction(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({ ...{ class: ("d-flex flex-column bg-green area-large") }, });
+    __VLS_elementAsFunction(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({ ...{ class: ("d-flex bg-green area-head") }, });
+    __VLS_elementAsFunction(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({ ...{ class: ("d-flex bg-blue notifications-container") }, });
+    for (const [notification] of __VLS_getVForSourceType((__VLS_ctx.notifications))) {
+        __VLS_elementAsFunction(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({ key: ((notification.id)), ...{ class: ("notification-item") }, });
+        __VLS_elementAsFunction(__VLS_intrinsicElements.p, __VLS_intrinsicElements.p)({ ...{ class: ("notification-title") }, });
+        (notification.title);
+        __VLS_elementAsFunction(__VLS_intrinsicElements.p, __VLS_intrinsicElements.p)({ ...{ class: ("notification-message") }, });
+        (notification.message);
     }
+    __VLS_styleScopedClasses['d-flex'];
+    __VLS_styleScopedClasses['align-items-center'];
+    __VLS_styleScopedClasses['justify-content-between'];
+    __VLS_styleScopedClasses['home-page'];
+    __VLS_styleScopedClasses['d-flex'];
+    __VLS_styleScopedClasses['flex-column'];
+    __VLS_styleScopedClasses['d-flex'];
+    __VLS_styleScopedClasses['flex-column'];
+    __VLS_styleScopedClasses['area-small'];
+    __VLS_styleScopedClasses['d-flex'];
+    __VLS_styleScopedClasses['bg-green'];
+    __VLS_styleScopedClasses['area-head'];
+    __VLS_styleScopedClasses['d-flex'];
+    __VLS_styleScopedClasses['bg-blue'];
+    __VLS_styleScopedClasses['chart-container'];
+    __VLS_styleScopedClasses['test2'];
+    __VLS_styleScopedClasses['chart-title'];
+    __VLS_styleScopedClasses['chart-canvas'];
+    __VLS_styleScopedClasses['test'];
+    __VLS_styleScopedClasses['chart-title'];
+    __VLS_styleScopedClasses['chart-canvas'];
+    __VLS_styleScopedClasses['circle-chart'];
+    __VLS_styleScopedClasses['test2'];
+    __VLS_styleScopedClasses['chart-title'];
+    __VLS_styleScopedClasses['chart-canvas'];
+    __VLS_styleScopedClasses['test2'];
+    __VLS_styleScopedClasses['chart-title'];
+    __VLS_styleScopedClasses['chart-canvas'];
+    __VLS_styleScopedClasses['test2'];
+    __VLS_styleScopedClasses['goal-progress-container'];
+    __VLS_styleScopedClasses['goal-chart'];
+    __VLS_styleScopedClasses['chart-title'];
+    __VLS_styleScopedClasses['goal-chart-canvas'];
+    __VLS_styleScopedClasses['chart-canvas'];
+    __VLS_styleScopedClasses['d-flex'];
+    __VLS_styleScopedClasses['flex-column'];
+    __VLS_styleScopedClasses['area-small'];
+    __VLS_styleScopedClasses['d-flex'];
+    __VLS_styleScopedClasses['bg-green'];
+    __VLS_styleScopedClasses['area-head'];
+    __VLS_styleScopedClasses['d-flex'];
+    __VLS_styleScopedClasses['flex-column'];
+    __VLS_styleScopedClasses['bg-blue'];
+    __VLS_styleScopedClasses['expense-form'];
+    __VLS_styleScopedClasses['d-flex'];
+    __VLS_styleScopedClasses['flex-column'];
+    __VLS_styleScopedClasses['form-label'];
+    __VLS_styleScopedClasses['form-input'];
+    __VLS_styleScopedClasses['form-label'];
+    __VLS_styleScopedClasses['form-input'];
+    __VLS_styleScopedClasses['form-label'];
+    __VLS_styleScopedClasses['form-input'];
+    __VLS_styleScopedClasses['form-label'];
+    __VLS_styleScopedClasses['form-input'];
+    __VLS_styleScopedClasses['submit-button'];
+    __VLS_styleScopedClasses['d-flex'];
+    __VLS_styleScopedClasses['flex-column'];
+    __VLS_styleScopedClasses['bg-green'];
+    __VLS_styleScopedClasses['area-large'];
+    __VLS_styleScopedClasses['d-flex'];
+    __VLS_styleScopedClasses['bg-green'];
+    __VLS_styleScopedClasses['area-head'];
+    __VLS_styleScopedClasses['d-flex'];
+    __VLS_styleScopedClasses['bg-blue'];
+    __VLS_styleScopedClasses['notifications-container'];
+    __VLS_styleScopedClasses['notification-item'];
+    __VLS_styleScopedClasses['notification-title'];
+    __VLS_styleScopedClasses['notification-message'];
+    var __VLS_slots;
+    var __VLS_inheritedAttrs;
+    const __VLS_refs = {
+        "incomeExpensesChart": __VLS_nativeElements['canvas'],
+        "remainingBudgetChart": __VLS_nativeElements['canvas'],
+        "assetDepreciationChart": __VLS_nativeElements['canvas'],
+        "monthlyExpenseChart": __VLS_nativeElements['canvas'],
+    };
+    var $refs;
+    var $el;
+    return {
+        attrs: {},
+        slots: __VLS_slots,
+        refs: $refs,
+        rootEl: $el,
+    };
 }
-
-.area-small {
-    height: auto;
-    background-color: #6a93c1;
-    width: 60vw;
-    margin-bottom: 2vh;
-}
-
-.area-small,
-.area-large {
-    border-radius: 8px;
-}
-
-.area-head {
-    font-family: 'Inter', sans-serif;
-    color: white;
-    font-size: 24px;
-    font-weight: 700;
-    font-style: italic;
-    justify-content: center;
-    border-top-right-radius: 8px;
-    border-top-left-radius: 8px;
-    padding: 0.25rem;
-}
-
-.area-large {
-    height: 80vh;
-    background-color: #6a93c1;
-    width: 15vw;
-}
-
-.area-small .bg-blue {
-    padding: 10px;
-}
-
-/* Notifications Styles */
-.notifications-container {
-    display: flex;
-    flex-direction: column;
-    padding: 10px;
-    gap: 10px;
-    overflow-y: auto;
-}
-
-.notification-item {
-    background-color: #ffffff;
-    padding: 10px;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    animation: fadeInUp 0.5s ease-out;
-}
-
-.notification-title {
-    font-size: 16px;
-    font-weight: bold;
-    color: #333;
-}
-
-.notification-message {
-    font-size: 14px;
-    color: #555;
-}
-
-.expense-form {
-    padding: 20px;
-    gap: 10px;
-    border-radius: 8px;
-}
-
-.form-label {
-    color: black;
-    font-size: 14px;
-    margin-bottom: 5px;
-}
-
-.form-input {
-    padding: 10px;
-    border: none;
-    border-radius: 4px;
-    margin-bottom: 15px;
-    font-size: 14px;
-
-}
-
-.submit-button {
-    padding: 10px;
-    border: none;
-    border-radius: 4px;
-    background-color: #78bd80;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-    align-self: center;
-    width: 50%;
-    text-align: center;
-}
-
-.submit-button:hover {
-    background-color: #89ce91;
-}
-</style>
+;
+const __VLS_self = (await import('vue')).defineComponent({
+    setup() {
+        return {
+            userGoals: userGoals,
+            currentUser: currentUser,
+            incomeExpensesChart: incomeExpensesChart,
+            remainingBudgetChart: remainingBudgetChart,
+            assetDepreciationChart: assetDepreciationChart,
+            monthlyExpenseChart: monthlyExpenseChart,
+            goalCharts: goalCharts,
+            newExpense: newExpense,
+            handleSubmit: handleSubmit,
+            formatDate: formatDate,
+            notifications: notifications,
+        };
+    },
+    props: {
+        userId: {
+            type: String,
+            required: true
+        }
+    },
+});
+export default (await import('vue')).defineComponent({
+    setup() {
+        return {};
+    },
+    props: {
+        userId: {
+            type: String,
+            required: true
+        }
+    },
+    __typeEl: {},
+});
+; /* PartiallyEnd: #4569/main.vue */

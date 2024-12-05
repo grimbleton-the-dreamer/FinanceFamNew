@@ -3,20 +3,22 @@ services:
     build:
       context: ./postgresDB
       dockerfile: Dockerfile
-    volumes:
-      - pgdata:/var/lib/postgressql/data
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
+    volumes:
+      - pgdata:/var/lib/postgressql/data
     ports:
-      - "5555:5432" #Expose port so dev can test
+      - "5432:5432" #Expose port so dev can test
     container_name: postgres
-  
+  financefam:
+    build:
+      context: ./FinanceFamApp
+      dockerfile: Dockerfile  # Use your provided Dockerfile for the multi-stage build
+    container_name: financefam
+    ports:
+      - "80:80"  # Expose port internally for Nginx to route requests to
+
 volumes:
   pgdata:
-
-
-
-
-
