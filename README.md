@@ -1,9 +1,9 @@
-# FinanceFam (Developer Guide)
+# FinanceFam Developer Guide and User Manual
 
 FinanceFam is a financial management application designed for efficiency and ease of use. This guide provides detailed instructions for installing dependencies and running the application.
 
 ---
-
+# Developer Guide
 ## **Prerequisites**
 
 Before running the application, ensure you have Docker installed on your system.
@@ -41,3 +41,56 @@ After running these commands open your browser and navigate to: **http://localho
 ## Login
 **Username:** mkovach
 **Password:** password123
+
+## User Manual
+# **FinanceFam User Guide**
+
+Welcome to FinanceFam! This application helps you manage your finances effectively by tracking income, expenses, budgets, savings goals, and more. Follow this guide to get started.
+
+---
+
+## **Getting Started**
+
+1. **Login:**
+   - Enter your username and password on the login page.
+   - Admin users have access to multiple user accounts' financial data by default.
+
+---
+
+## **Navigation**
+
+- Use the **sidebar on the left** to navigate between pages:
+  - **Dashboard:** View your financial summary and charts.
+  - **Income vs Expenses:** Track your monthly financial trends.
+  - **Budgets:** Manage your budgets and savings goals.
+  - **Assets & Depreciation:** Monitor your asset values over time.
+  - **Recurring Expenses:** Review and adjust recurring costs.
+
+---
+
+## **Submitting Data**
+
+- At the bottom of each page, you’ll find **data entry forms** to:
+  - Add income or expenses.
+  - Update budgets or savings goals.
+  - Record changes to assets or recurring expenses.
+- Submit the form, and the data will automatically update your charts and insights.
+
+---
+
+## **Interactive Features**
+
+- As you interact with the site, **charts will dynamically update** to reflect your changes, providing real-time feedback on your financial health.
+
+---
+
+## **Notifications**
+
+- Keep track of important updates and reminders:
+  - Notifications about budgets, expenses, savings goals, and asset depreciation are available in the **upper-right corner**.
+
+---
+
+Manage your finances with ease and take control of your financial future. If you have any questions, feel free to reach out to our support team. Enjoy using FinanceFam!
+
+##
