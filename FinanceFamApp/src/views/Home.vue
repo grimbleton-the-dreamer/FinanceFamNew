@@ -335,7 +335,7 @@ const setupRemainingBudgetChart = () => {
                     },
                     tooltip: {
                         callbacks: {
-                            label: function (context: TooltipItem<ChartType>) {
+                            label: function (context: any) {
                                 return `${context.label}: $${context.parsed}`;
                             },
                         },
@@ -422,7 +422,7 @@ const setupAssetDepreciationChart = () => {
                     },
                     tooltip: {
                         callbacks: {
-                            label: function (context: TooltipItem<ChartType>) {
+                            label: function (context: any) {
                                 return `${context.dataset.label}: $${context.parsed.y.toFixed(2)}`;
                             },
                         },
@@ -475,7 +475,7 @@ const setupGoalProgressCharts = () => {
                         },
                         tooltip: {
                             callbacks: {
-                                label: function (context: TooltipItem<ChartType>) {
+                                label: function (context: any) {
                                     return `${context.label}: ${context.parsed}%`;
                                 },
                             },
