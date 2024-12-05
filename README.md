@@ -1,4 +1,4 @@
-# FinanceFam
+# FinanceFam (Developer Guide)
 
 FinanceFam is a financial management application designed for efficiency and ease of use. This guide provides detailed instructions for installing dependencies and running the application.
 
