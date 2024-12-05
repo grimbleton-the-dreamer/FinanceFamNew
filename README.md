@@ -42,8 +42,7 @@ After running these commands open your browser and navigate to: **http://localho
 **Username:** mkovach
 **Password:** password123
 
-## User Manual
-# **FinanceFam User Guide**
+# **FinanceFam User Manual**
 
 Welcome to FinanceFam! This application helps you manage your finances effectively by tracking income, expenses, budgets, savings goals, and more. Follow this guide to get started.
 
