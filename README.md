@@ -94,7 +94,7 @@ https://financefam.asecrettoeveryone.com
 ## **Notifications**
 
 - Keep track of important updates and reminders:
-  - Notifications about budgets, expenses, savings goals, and asset depreciation are available in the **upper-right corner**.
+  - Notifications about expenses, and savings goals are available in the **upper-right corner**.
 
 ---
 
