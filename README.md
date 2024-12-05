@@ -38,8 +38,12 @@ If the first set of commands doesn't work, try these:
   ```
 After running these commands open your browser and navigate to: **http://localhost:80**
 
-## Login
+## Admin Login
 **Username:** mkovach
+**Password:** password123
+
+## Regular User Login
+**Username:** yongjianfu
 **Password:** password123
 
 # **FinanceFam User Manual**
