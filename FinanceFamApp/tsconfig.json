@@ -10,7 +10,7 @@
   ],
   "compilerOptions": {
     "target": "ESNext",                         // Use the latest ECMAScript version
-    "module": "ESNext",                         // Use ES module syntax (import/export)
+    "module": "CommonJS",                         // Use ES module syntax (import/export)
     "moduleResolution": "node",                 // Use Node.js resolution strategy for modules
     "esModuleInterop": true,                    // Ensure compatibility between CommonJS and ES modules
     "allowSyntheticDefaultImports": true,       // Allow default imports from CommonJS modules
@@ -20,7 +20,7 @@
     "baseUrl": "./src",                         // Base directory for module resolution
     "resolveJsonModule": true,                  // Allow importing .json files
     "noEmit": false,                            // Ensure TypeScript emits compiled files
-    "declaration": true,                        // Emit declaration files (.d.ts) for type definitions
+    "declaration": false,                        // Emit declaration files (.d.ts) for type definitions
     "isolatedModules": true                     // Ensures that each file can be safely transpiled without dependency on other files
   },
   "include": [
