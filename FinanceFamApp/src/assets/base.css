@@ -1,29 +1,21 @@
 /* color palette from <https://github.com/vuejs/theme> */
 :root {
   --cyber-purple: white;
-  
   --vt-c-white: #ffffff;
   --vt-c-white-soft: #f8f8f8;
   --vt-c-white-mute: #f2f2f2;
 
   /* Site background colors */
-
-
 }
 
 /* semantic color variables for this project */
 :root {
   --color-background: #D9D9D9;
-
-
-
-
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --color-background: #D9D9D9;
-
   }
 }
 

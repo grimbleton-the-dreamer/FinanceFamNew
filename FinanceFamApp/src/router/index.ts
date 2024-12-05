@@ -10,7 +10,7 @@ const router = createRouter({
     {
       path: '/home',
       name: 'home',
-      component: () => import('../views/Home.vue')
+      component: () => import('../views/HomeWrapper.vue')
     },
     {
       path: '/login',
@@ -18,20 +18,10 @@ const router = createRouter({
       component: () => import('../views/Accounts.vue')
     },
     {
-      path: '/household',
-      name: 'household',
-      component: () => import('../views/Household.vue')
-    },
-    {
-      path: '/finances',
-      name: 'finances',
-      component: () => import('../views/AssetsExpenses.vue')
-    },
-    {
-      path: '/admintools',
-      name: 'admintools',
-      component: () => import('../views/AdminTools.vue')
-    },
+      path: '/about',
+      name: 'about',
+      component: () => import('../views/About.vue')
+    }
   ]
 });
 

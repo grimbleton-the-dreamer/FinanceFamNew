@@ -1,29 +1,42 @@
 <template>
     <div class="d-flex align-items-center justify-content-between home-page">
+
         <div class="d-flex flex-column">
+
             <!-- Charts Area -->
             <div class="d-flex flex-column area-small">
                 <div class="d-flex bg-green area-head">
-                    Charts
+                    Charts for {{ currentUser?.name }}
                 </div>
+
+                <!-- Chart canvases -->
                 <div class="d-flex bg-blue chart-container">
-                    <!-- Chart canvases -->
+
+                    <!-- Income vs. expenses chart -->
                     <div class="test2">
                         <p class="chart-title">Income vs Expenses</p>
                         <canvas ref="incomeExpensesChart" class="chart-canvas"></canvas>
                     </div>
+
+                    <!-- Remaining monthly budget chart -->
                     <div class="test">
                         <p class="chart-title">Remaining Budget</p>
                         <canvas ref="remainingBudgetChart" class="chart-canvas circle-chart"></canvas>
                     </div>
+
+                    <!-- Asset depreciation chart -->
                     <div class="test2">
                         <p class="chart-title">Asset Depreciation</p>
                         <canvas ref="assetDepreciationChart" class="chart-canvas"></canvas>
                     </div>
+
+                    <!-- Monthly expenses chart -->
                     <div class="test2">
                         <p class="chart-title">Monthly Expenses</p>
                         <canvas ref="monthlyExpenseChart" class="chart-canvas"></canvas>
                     </div>
+
+                    <!-- Goals progress chart -->
                     <div class="test2">
                         <div v-if="userGoals.length" class="goal-progress-container">
                             <div v-for="(goal, index) in userGoals" :key="goal.goalID" class="goal-chart">
@@ -40,7 +53,7 @@
                 </div>
             </div>
 
-
+            <!-- Expenses form -->
             <div class="d-flex flex-column area-small">
                 <div class="d-flex bg-green area-head">
                     Add a Recurring Expense
@@ -84,84 +97,49 @@
             </div>
         </div>
     </div>
-
-    <!-- Second Row -->
-    <!--<div class="d-flex align-items-center justify-content-between home-page">
-        <div class="d-flex flex-column">
-            <div class="d-flex flex-column area-small">
-                <div class="d-flex bg-green area-head">
-                    Something else...
-                </div>
-                <div class="d-flex bg-blue">
-                    Content here
-                </div>
-            </div>
-        </div>
-
-        
-        <div class="d-flex flex-column bg-green area-large">
-            <div class="d-flex bg-green area-head">
-                Summary
-            </div>
-            <div class="d-flex bg-blue">
-                Summary content here
-            </div>
-        </div>
-    </div>-->
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, nextTick } from 'vue';
+import { ref, onMounted, watch, nextTick, defineProps } from 'vue';
 import { Chart } from 'chart.js/auto';
 import { useAuthStore } from '../stores/useAuthStore';
 import { users as Users, assets as Assets, expenses as Expenses, goals as Goals } from '../stores/mockdata';
+import { type User, type Asset, type Expense, type Goal } from '../stores/types'; 
 
+const props = defineProps({
+  userId: {
+    type: String, 
+    required: true 
+  }
+});
+
+// Reactive variables
 const users = ref<User[]>(Users);
 const assets = ref<Asset[]>(Assets);
 const expenses = ref<Expense[]>(Expenses);
 const goals = ref<Goal[]>(Goals);
-
+const managedUsers = ref<User[]>([]);
 const authStore = useAuthStore();
+const userID = ref<string>(props.userId);
+const isAdmin = ref<boolean>(false);
+const userGoals = ref<Goal[]>([]);
+const currentUser = ref(users.value.find(e => e.userID == userID.value));
 
-export interface User {
-    userID: string;
-    name: string;
-    password: string;
-    role: string;
-    yearlySalary?: number;
-    bankAmount?: number;
-    adminID: number | null;
-}
+// Chart instances
+let incomeExpensesChartInstance: Chart | null = null;
+let remainingBudgetChartInstance: Chart | null = null;
+let assetDepreciationChartInstance: Chart | null = null;
+let monthlyExpenseChartInstance: Chart | null = null;
+let goalChartInstances: Chart[] = [];
 
-export interface Asset {
-    assetID: string;
-    userID: string;
-    name: string;
-    initialPurchaseDate: Date;
-    purchasePrice: number;
-    desiredLifeSpan: number;
-}
+// References to the chart canvases
+const incomeExpensesChart = ref<HTMLCanvasElement | null>(null);
+const remainingBudgetChart = ref<HTMLCanvasElement | null>(null);
+const assetDepreciationChart = ref<HTMLCanvasElement | null>(null);
+const monthlyExpenseChart = ref<HTMLCanvasElement | null>(null);
+const goalCharts = ref<HTMLCanvasElement[]>([]);
 
-export interface Expense {
-    expenseID: string;
-    userID: string;
-    category: string;
-    amount: number;
-    dueDate: Date;
-    description?: string;
-    recurring: boolean;
-    isPaid: boolean;
-}
-
-export interface Goal {
-    goalID: string;
-    userID: string;
-    targetAmount: number;
-    progress?: string;
-    category: string;
-    deadline: Date;
-}
-
+// Reactive variable to hold expense form data 
 const newExpense = ref({
     category: '',
     amount: 0,
@@ -170,11 +148,13 @@ const newExpense = ref({
     isPaid: false,
 });
 
+// Function to handle expense form submission
 const handleSubmit = async () => {
     console.log('New expense data:', newExpense.value);
     if (!(userID.value.length > 0)) return;
 
-    const expenseID = (expenses.value.length + 1).toString(); // Generate a new ID based on the array length
+    const expenseID = (expenses.value.length + 1).toString();
+
     const newExpenseData = {
         expenseID,
         userID: userID.value,
@@ -185,7 +165,7 @@ const handleSubmit = async () => {
         isPaid: false,
     };
 
-    expenses.value.push(newExpenseData); // Append the new expense to the mock data array
+    expenses.value.push(newExpenseData);
     console.log('New expense added:', newExpenseData);
 
     // Clear the form fields after submission
@@ -198,75 +178,50 @@ const handleSubmit = async () => {
     };
     console.log(expenses.value);
 
+    // Reload the charts to reflect new data 
     userGoals.value = goals.value.filter(goal => goal.userID === userID.value);
     await nextTick();
+    goalCharts.value = [];
     setupIncomeExpensesChart();
     setupRemainingBudgetChart();
     setupAssetDepreciationChart();
-    setupGoalProgressCharts();
+    //setupGoalProgressCharts();
     setupMonthlyExpenseChart();
 };
 
-const userID = ref<string>(authStore.currentUser?.userID ?? '');
-
-const incomeExpensesChart = ref<HTMLCanvasElement | null>(null);
-const remainingBudgetChart = ref<HTMLCanvasElement | null>(null);
-const assetDepreciationChart = ref<HTMLCanvasElement | null>(null);
-const monthlyExpenseChart = ref<HTMLCanvasElement | null>(null);
-
-const totalExpenses = ref(0);
-const remainingBudget = ref(0);
-const goalProgress = ref(0);
-
-const goalCharts = ref<HTMLCanvasElement[]>([]);
-const userGoals = ref<Goal[]>([]);
-
-const notifications = ref<{ id: string; title: string; message: string }[]>([]);
-
-const formatDate = (date: Date): string => {
-    return date.toLocaleDateString();
-};
-
-// Generate notifications for unpaid expenses and upcoming goals
-const today = new Date();
-expenses.value.forEach(expense => {
-    if (expense.userID === userID.value && !expense.isPaid) {
-        const isPastDue = expense.dueDate < today;
-        notifications.value.push({
-            id: `expense-${expense.expenseID}`,
-            title: `Unpaid Expense: ${expense.category}`,
-            message: isPastDue
-                ? `Your ${expense.category} expense of $${expense.amount} is past due.`
-                : `You have an unpaid ${expense.category} expense of $${expense.amount} due on ${expense.dueDate.toLocaleDateString()}.`
-        });
+// Determine admin status and fetch managed users
+function getManagedUsers(): void {
+    const user = users.value.find(e => e.userID === authStore.currentUser?.userID);
+    console.log("USER: ", user);
+    if (user?.role === "admin") {
+        isAdmin.value = true;
+        managedUsers.value = users.value.filter(e => String(e.adminID) === userID.value);
+        console.log("MANAGED USERS", managedUsers.value);
+    } else {
+        isAdmin.value = false;
+        managedUsers.value = [];
     }
-});
+}
 
-// Only add goals if the target amount is less than $10,000
-goals.value.forEach(goal => {
-    if (goal.userID === userID.value) {
-        const deadline = new Date(goal.deadline);
-        const daysRemaining = Math.ceil((deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-
-        if (daysRemaining <= 30) {
-            const progressValue = parseFloat(goal.progress?.replace('%', '') || '0') / 100;
-            const spentAmount = goal.targetAmount * progressValue;
-            notifications.value.push({
-                id: `goal-${goal.goalID}`,
-                title: `Upcoming Goal: ${goal.category}`,
-                message: goal.category === 'savings'
-                    ? `Your goal of $${goal.targetAmount} in ${goal.category} is ${goal.progress} complete and has a deadline in ${daysRemaining} days.`
-                    : `You have spent $${spentAmount} of your $${goal.targetAmount} goal. This goal period ends in ${daysRemaining} days.`
-            });
-        }
+// Destroy an existing chart instance
+function destroyChart(chartInstance: Chart | null): void {
+    if (chartInstance) {
+        chartInstance.destroy();
     }
-});
+}
+
+// Destroy all goal chart instances
+function destroyGoalCharts(): void {
+    goalChartInstances.forEach(chart => chart.destroy());
+    goalChartInstances = [];
+}
 
 // Income vs Expenses Chart
 const setupIncomeExpensesChart = () => {
+    destroyChart(incomeExpensesChartInstance);
     if (incomeExpensesChart.value) {
         const user = users.value.find(user => user.userID === userID.value);
-        new Chart(incomeExpensesChart.value, {
+        incomeExpensesChartInstance = new Chart(incomeExpensesChart.value, {
             type: 'bar',
             data: {
                 labels: ['Income', 'Expenses'],
@@ -327,6 +282,7 @@ const setupIncomeExpensesChart = () => {
 
 // Remaining Budget Chart
 const setupRemainingBudgetChart = () => {
+    destroyChart(remainingBudgetChartInstance);
     if (remainingBudgetChart.value) {
         const user = users.value.find(user => user.userID === userID.value);
         const userExpenses = expenses.value.filter(expense => expense.userID === userID.value);
@@ -354,7 +310,7 @@ const setupRemainingBudgetChart = () => {
         const totalSpentIncludingAssets = totalSpent + totalAssetCost;
         const remaining = (user?.bankAmount || 0) - totalSpentIncludingAssets;
 
-        new Chart(remainingBudgetChart.value, {
+        remainingBudgetChartInstance = new Chart(remainingBudgetChart.value, {
             type: 'doughnut',
             data: {
                 labels: ['Remaining Budget', 'Spent'],
@@ -379,7 +335,7 @@ const setupRemainingBudgetChart = () => {
                     },
                     tooltip: {
                         callbacks: {
-                            label: function (context: { label: string; parsed: number; }) {
+                            label: function (context) {
                                 return `${context.label}: $${context.parsed}`;
                             },
                         },
@@ -392,6 +348,7 @@ const setupRemainingBudgetChart = () => {
 
 // Asset Depreciation Chart
 const setupAssetDepreciationChart = () => {
+    destroyChart(assetDepreciationChartInstance);
     if (assetDepreciationChart.value) {
         const userAssets = assets.value.filter(asset => asset.userID === userID.value);
 
@@ -416,13 +373,13 @@ const setupAssetDepreciationChart = () => {
             };
         });
 
-        new Chart(assetDepreciationChart.value, {
+        const maxYears = Math.max(...userAssets.map(a => a.desiredLifeSpan)) + 1;
+        const labels = Array.from({ length: maxYears }, (_, i) => `Year ${i}`);
+
+        assetDepreciationChartInstance = new Chart(assetDepreciationChart.value, {
             type: 'line',
             data: {
-                labels: Array.from(
-                    { length: Math.max(...userAssets.map(a => a.desiredLifeSpan)) + 1 },
-                    (_, i) => `Year ${i}`
-                ),
+                labels,
                 datasets,
             },
             options: {
@@ -465,7 +422,7 @@ const setupAssetDepreciationChart = () => {
                     },
                     tooltip: {
                         callbacks: {
-                            label: function (context: { dataset: { label: string }; parsed: { y: number } }) {
+                            label: function (context) {
                                 return `${context.dataset.label}: $${context.parsed.y.toFixed(2)}`;
                             },
                         },
@@ -488,12 +445,13 @@ const getRandomColor = () => {
 
 // Goal Progress Charts (Pie Charts)
 const setupGoalProgressCharts = () => {
+    destroyGoalCharts();
     userGoals.value.forEach((goal, index) => {
         const progressValue = parseFloat(goal.progress?.replace('%', '') || '0');
         const ctx = goalCharts.value[index];
 
         if (ctx) {
-            new Chart(ctx, {
+            const chartInstance = new Chart(ctx, {
                 type: 'pie',
                 data: {
                     labels: ['Progress', 'Remaining'],
@@ -517,7 +475,7 @@ const setupGoalProgressCharts = () => {
                         },
                         tooltip: {
                             callbacks: {
-                                label: function (context: { label: string; parsed: number }) {
+                                label: function (context) {
                                     return `${context.label}: ${context.parsed}%`;
                                 },
                             },
@@ -525,12 +483,14 @@ const setupGoalProgressCharts = () => {
                     },
                 },
             });
+            goalChartInstances.push(chartInstance);
         }
     });
 };
 
 // Monthly Expense Chart
 const setupMonthlyExpenseChart = () => {
+    destroyChart(monthlyExpenseChartInstance);
     if (monthlyExpenseChart.value) {
         const monthlyExpenses = Array(12).fill(0);
         expenses.value
@@ -539,7 +499,7 @@ const setupMonthlyExpenseChart = () => {
                 const month = new Date(expense.dueDate).getMonth();
                 monthlyExpenses[month] += expense.amount;
             });
-        new Chart(monthlyExpenseChart.value, {
+        monthlyExpenseChartInstance = new Chart(monthlyExpenseChart.value, {
             type: 'line',
             data: {
                 labels: [
@@ -608,7 +568,52 @@ const setupMonthlyExpenseChart = () => {
     }
 };
 
+// Format date function
+const formatDate = (date: Date): string => {
+    return date.toLocaleDateString();
+};
+
+// Notifications
+const notifications = ref<{ id: string; title: string; message: string }[]>([]);
+
+// Generate notifications for unpaid expenses and upcoming goals
+const today = new Date();
+expenses.value.forEach(expense => {
+    if (expense.userID === userID.value && !expense.isPaid) {
+        const isPastDue = expense.dueDate < today;
+        notifications.value.push({
+            id: `expense-${expense.expenseID}`,
+            title: `Unpaid Expense: ${expense.category}`,
+            message: isPastDue
+                ? `Your ${expense.category} expense of $${expense.amount} is past due.`
+                : `You have an unpaid ${expense.category} expense of $${expense.amount} due on ${expense.dueDate.toLocaleDateString()}.`
+        });
+    }
+});
+
+// Only add goals if the target amount is less than $10,000
+goals.value.forEach(goal => {
+    if (goal.userID === userID.value) {
+        const deadline = new Date(goal.deadline);
+        const daysRemaining = Math.ceil((deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+
+        if (daysRemaining <= 30) {
+            const progressValue = parseFloat(goal.progress?.replace('%', '') || '0') / 100;
+            const spentAmount = goal.targetAmount * progressValue;
+            notifications.value.push({
+                id: `goal-${goal.goalID}`,
+                title: `Upcoming Goal: ${goal.category}`,
+                message: goal.category === 'savings'
+                    ? `Your goal of $${goal.targetAmount} in ${goal.category} is ${goal.progress} complete and has a deadline in ${daysRemaining} days.`
+                    : `You have spent $${spentAmount} of your $${goal.targetAmount} goal. This goal period ends in ${daysRemaining} days.`
+            });
+        }
+    }
+});
+
+// Watch for changes in userID to update data and charts
 watch(userID, async () => {
+    getManagedUsers();
     userGoals.value = goals.value.filter(goal => goal.userID === userID.value);
     await nextTick();
     goalCharts.value = [];
@@ -619,7 +624,9 @@ watch(userID, async () => {
     setupMonthlyExpenseChart();
 });
 
+// Load each chart and get managed users on component mount
 onMounted(async () => {
+    getManagedUsers();
     userGoals.value = goals.value.filter(goal => goal.userID === userID.value);
     await nextTick();
     setupIncomeExpensesChart();

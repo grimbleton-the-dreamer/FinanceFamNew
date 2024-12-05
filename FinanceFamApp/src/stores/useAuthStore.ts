@@ -2,6 +2,8 @@
 import { defineStore } from 'pinia';
 import { users } from './mockdata'; // Import your mock data
 import type { User } from './types';
+import { getUsers } from '../queries/users';
+import axios from 'axios';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -11,6 +13,10 @@ export const useAuthStore = defineStore('auth', {
   actions: {
     login(username: string, password: string) {
       // Find the user in the mock data
+      axios.get("http://localhost:3000/api/users")
+        .then(response => {
+          console.log("USERS: ", response.data);
+        })
       const user = users.find(u => u.name === username && u.password === password);
 
       if (user) {

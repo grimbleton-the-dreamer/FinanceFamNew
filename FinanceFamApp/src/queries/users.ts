@@ -12,6 +12,19 @@ export interface User {
   adminID: string | null;
 }
 
+export async function getUsers(): Promise<User[]> {
+  try {
+    const query = `SELECT * FROM users`;
+    const result = await pool.query(query);
+    // Return all rows (i.e., all users) from the result
+    return result.rows;
+  } catch (err) {
+    console.error('Error fetching all users:', err);
+    // Return an empty array in case of an error
+    return [];
+  }
+}
+
 // Function to get a user by ID
 export async function getUserById(userID: string): Promise<User | null> {
   try {

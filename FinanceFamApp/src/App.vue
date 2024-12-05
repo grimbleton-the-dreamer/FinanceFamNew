@@ -1,12 +1,15 @@
 <template>
     <div v-if="!$route.path.includes('login')" class="wrapper">
+        <!-- Navigation menu -->
         <nav>
+            <!-- Button to open the menu-->
             <button class="burger"
                     @click="toggleMenu">
                 <div :class="{ 'line': true, 'open': menuOpen, 'burger-closing': burgerClosing }"></div>
                 <div :class="{ 'line': true, 'open': menuOpen, 'burger-closing': burgerClosing }"></div>
                 <div :class="{ 'line': true, 'open': menuOpen, 'burger-closing': burgerClosing }"></div>
             </button>
+            <!-- Links -->
             <ul :class="{ 'nav-list': true, 'open': menuOpen, 'closing': isClosing }"
                 @animationend="handleMenuAnimationEnd"
                 :style="navStyle()">
@@ -21,8 +24,6 @@
                     <router-link class="navigation-tabs"
                                  :to="link.path">{{ link.name }}</router-link>
                 </li>
-
-
             </ul>
         </nav>
     </div>
@@ -36,12 +37,13 @@ const menuOpen = ref<boolean>(false);
 const isClosing = ref<boolean>(false);
 const burgerClosing = ref<boolean>(false);
 
+//Handles opening and closing of the navigation menu
 function toggleMenu(): void {
     if (menuOpen.value) {
         isClosing.value = true; // Start the closing animation for the menu
         burgerClosing.value = true; // Start the closing animation for the burger
     } else {
-        menuOpen.value = true; // Open the menu
+        menuOpen.value = true;
         burgerClosing.value = false;
     }
 }
@@ -49,18 +51,18 @@ function toggleMenu(): void {
 function handleMenuAnimationEnd(): void {
     if (isClosing.value) {
         menuOpen.value = false; // Hide the menu after the slide-out animation ends
-        isClosing.value = false; // Reset the closing flag for the menu
+        isClosing.value = false; 
     }
 }
 
-const links = [
+// Links to other pages in the site
+const links: Array<{ name: string; path: string; }> = [
     { name: 'Home', path: '/home' },
     { name: 'Login', path: '/login' },
-    { name: 'Assets & Expenses', path: '/finances' },
-    { name: 'Household', path: '/household' },
-    { name: 'Admin Tools', path: '/admintools' }
+    { name: 'About', path: '/about' },
 ];
 
+//Changes the layout of the open navigation menu on smaller screens
 function navStyle(): { [key: string]: string } {
     if (window.screen.width > 1040) {
         return {};
