@@ -29,3 +29,9 @@ Follow these steps to set up and run the FinanceFam application:
    Open a terminal and navigate to the `FinanceFamNew` folder:
    ```bash
    cd /path/to/FinanceFamNew
+   docker compose up -d
+If the first set of commands doesn't work, try these:
+  ```bash
+  cd /path/to/FinanceFamNew
+  docker-compose up -d
+meow
