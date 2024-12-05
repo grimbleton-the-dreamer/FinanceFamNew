@@ -30,8 +30,14 @@ Follow these steps to set up and run the FinanceFam application:
    ```bash
    cd /path/to/FinanceFamNew
    docker compose up -d
+   ```
 If the first set of commands doesn't work, try these:
   ```bash
   cd /path/to/FinanceFamNew
   docker-compose up -d
-meow
+  ```
+After running these commands open your browser and navigate to: **http://localhost:80**
+
+## Login
+**Username:** mkovach
+**Password:** password123
